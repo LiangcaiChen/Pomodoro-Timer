@@ -9,41 +9,64 @@ class App extends Component {
         super(props);
 
         this.state ={
+            round:4,
             minute:25,
             second:0,
+            restMinute:5,
+            restSecond:0,
+            settingContainer:[4,25,0,5,0],
             completed:0,
-            timerStatus: undefined
+            timerBtnStatus: undefined,
+            timerWorkingState: undefined
         };
     }
 
-    // set default timer 25:00
-    handleUpdateTimer = (minute, second) => {
+    // set default timer rounds:4; working time: 25:00;
+    handleUpdateTimer = (round=4, minute, second, restMinute, restSecond) => {
+
+        if(!round) {
+            round=4
+        }
         if(!minute) {
-            minute = 25
+            minute=25
+        }
+        if(!second) {
+            second=0
+        }
+        if(!restMinute){
+            restMinute=5
+        }
+        if(!restSecond) {
+            restSecond = 0
         }
 
-        if (!second) {
-            second = 0
-        }
-
-        if(second > 59 || second < 0 || minute < 0 || (second == 0 && minute == 0)) {
+        if(second > 59 || second < 0 || minute < 0 || (second == 0 && minute == 0) || round < 0 || restMinute < 0 || restSecond < 0) {
             return 'Please enter valid time';
         }
 
         this.setState(() => {
-            return {minute: minute, second:second}
+            return {
+                round:round,
+                minute: minute,
+                second:second,
+                restMinute:restMinute,
+                restSecond:restSecond,
+                settingContainer:[round, minute, second, restMinute, restSecond]
+            }
         });
     };
 
     handleStartTimer = () => {
         this.intervalHandle = setInterval(this.tick, 1000);
-        this.setState({timerStatus:'Start'});
-
+        this.setState({
+            timerBtnStatus:'Start',
+            timerWorkingState: 'Working'
+        });
     };
 
     handlePauseTimer = () => {
         clearInterval(this.intervalHandle);
-        this.setState({timerStatus:'Pause'});
+        this.setState({timerBtnStatus:'Pause'});
     };
 
     handleStopTimer = () => {
@@ -51,14 +74,14 @@ class App extends Component {
         this.setState({
             minute:25,
             second:0,
-            timerStatus:'Stop'
+            timerBtnStatus:'Stop',
+            timeWorkingStatus: undefined
         });
     };
 
     tick = () => {
-
         if(this.state.second >= 0) {
-            console.log(this.state.minute);
+            console.log('Second: ' + this.state.second);
             this.setState((prevState)=>{
                 return (
                     {second: prevState.second-1}
@@ -75,24 +98,50 @@ class App extends Component {
             })
         }
 
-        if(this.state.minute <= 0 && this.state.second < 0) {
-            console.log('finished');
-            clearInterval(this.intervalHandle);
-            this.setState((prevState) => {
-                return (
-                    {completed: prevState.completed+1,
-                     second: 0,
-                     timerStatus:'Stop'}
-                )
-            })
+        let container = this.state.settingContainer;
+        if(this.state.minute <= 0 && this.state.second <= 0 && this.state.round > 0) {
+            console.log('container:'+container);
+
+                if(this.state.timerWorkingState ==='Working') {
+                    console.log('x');
+                    this.resting();
+                }else if(this.state.timerWorkingState ==='Resting') {
+                    console.log('y')
+                    this.working();
+                }
         }
+    };
+
+    resting = () => {
+        console.log('resting...');
+        this.setState((prevState) => {
+            return {
+                time:prevState.settingContainer[3],
+                second:prevState.settingContainer[4],
+                timerWorkingState: 'Resting',
+                round: prevState.round - 1,
+                completed: prevState.completed + 1
+            }});
+    };
+
+    working = () => {
+        console.log('working...');
+        this.setState((prevState)=>{
+            return {
+                timerWorkingState: 'Working',
+                time: prevState.settingContainer[1],
+                second: prevState.settingContainer[2]
+
+            }})
     };
 
     render() {
         return (
             <div>
                 <Header title='Pomodoro Timer'/>
-                <Setting updateTimer={this.handleUpdateTimer} defaultMinute={this.state.minute} defaultSecond={this.state.second}/>
+                <Setting
+                    updateTimer={this.handleUpdateTimer}
+                    settingTitle='Setting'/>
                 <TimerBin complete={this.state.completed}/>
                 <Timer
                     minute={this.state.minute}
@@ -100,7 +149,7 @@ class App extends Component {
                     startTimer={this.handleStartTimer}
                     pauseTimer={this.handlePauseTimer}
                     stopTimer={this.handleStopTimer}
-                    status={this.state.timerStatus}
+                    status={this.state.timerBtnStatus}
                 />
             </div>
         )
