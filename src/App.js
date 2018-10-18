@@ -11,7 +11,8 @@ class App extends Component {
         this.state ={
             minute:25,
             second:0,
-            completed:0
+            completed:0,
+            timerStatus: undefined
         };
     }
 
@@ -36,10 +37,22 @@ class App extends Component {
 
     handleStartTimer = () => {
         this.intervalHandle = setInterval(this.tick, 1000);
+        this.setState({timerStatus:'Start'});
+
     };
 
     handlePauseTimer = () => {
         clearInterval(this.intervalHandle);
+        this.setState({timerStatus:'Pause'});
+    };
+
+    handleStopTimer = () => {
+        clearInterval(this.intervalHandle);
+        this.setState({
+            minute:25,
+            second:0,
+            timerStatus:'Stop'
+        });
     };
 
     tick = () => {
@@ -68,7 +81,8 @@ class App extends Component {
             this.setState((prevState) => {
                 return (
                     {completed: prevState.completed+1,
-                     second: 0}
+                     second: 0,
+                     timerStatus:'Stop'}
                 )
             })
         }
@@ -85,7 +99,8 @@ class App extends Component {
                     second={this.state.second}
                     startTimer={this.handleStartTimer}
                     pauseTimer={this.handlePauseTimer}
-                    timeStarted={this.state.timerStarted}
+                    stopTimer={this.handleStopTimer}
+                    status={this.state.timerStatus}
                 />
             </div>
         )
