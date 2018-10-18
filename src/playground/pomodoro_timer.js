@@ -17,12 +17,12 @@ class App extends Component {
             settingContainer:[4,25,0,5,0],
             completed:0,
             timerBtnStatus: undefined,
-            timerIsWorking: undefined
+            timerWorkingState: undefined
         };
     }
 
     // set default timer rounds:4; working time: 25:00; resting time: 5:00
-    handleUpdateTimer = (round, minute, second, restMinute, restSecond) => {
+    handleUpdateTimer = (round=4, minute, second, restMinute, restSecond) => {
 
         if(!round) {
             round=4
@@ -40,16 +40,9 @@ class App extends Component {
             restSecond = 0
         }
 
-        // inserted number get from setting is a type of string
-        round=parseInt(round); minute=parseInt(minute); second=parseInt(second); restMinute=parseInt(restMinute); restSecond=parseInt(restSecond);
-
-        if((second || minute  || restMinute || restSecond) < 0 || second > 59 || (second === 0 && minute === 0) || round <= 0) {
+        if(second > 59 || second < 0 || minute < 0 || (second == 0 && minute == 0) || round < 0 || restMinute < 0 || restSecond < 0) {
             return 'Please enter valid time';
         }
-
-        console.log('Round: ' + round + ' Minute: ' + minute + ' Second ' + second);
-        console.log(typeof minute);
-        console.log(typeof second);
 
         this.setState(() => {
             return {
@@ -67,7 +60,7 @@ class App extends Component {
         this.intervalHandle = setInterval(this.tick, 1000);
         this.setState({
             timerBtnStatus:'Start',
-            timerIsWorking: true
+            timerWorkingState: 'Working'
         });
     };
 
@@ -82,47 +75,42 @@ class App extends Component {
             minute:25,
             second:0,
             timerBtnStatus:'Stop',
-            timerIsWorking: undefined
+            timeWorkingStatus: undefined
         });
     };
 
     tick = () => {
-        let remainingSecond = this.state.second;
-        let remainingMinute = this.state.minute;
-        let isWorking = this.state.timerIsWorking;
-
-        // second count down bu 1
-        if(remainingSecond > 0) {
-            console.log('Seconds counting down...');
+        if(this.state.second >= 0) {
+            console.log('Second: ' + this.state.second);
             this.setState((prevState)=>{
                 return (
                     {second: prevState.second-1}
-                )})
-            // console.log(typeof remainingMinute)
+                )
+            })
         }
 
-        // min - 1 when second runs out
-        else if(remainingSecond === 0 && remainingMinute > 0) {
-            console.log('Minutes counting down by 1');
+        if(this.state.second < 0 && this.state.minute > 0) {
             this.setState((prevState)=>{
-                return ({
-                        minute: prevState.minute-1,
-                        second: 59
-                })});
-            console.log(typeof remainingMinute);
+                return (
+                    {minute: prevState.minute-1,
+                        second: 59}
+                )
+            })
         }
 
-        else if(remainingMinute === 0 && remainingSecond === 0 && this.state.round > 0) {
-            if(isWorking === true) {
+        let container = this.state.settingContainer;
+
+        if(this.state.minute <= 0 && this.state.second <= 0 && this.state.round > 0) {
+            console.log('container:'+container);
+
+            if(this.state.timerWorkingState ==='Working') {
+                console.log('x');
                 this.resting();
-            } else if (isWorking === false) {
+            }else if(this.state.timerWorkingState ==='Resting') {
+                console.log('y')
                 this.working();
             }
-        } else if (this.state.round === 0) {
-            this.timerFinish();
         }
-
-        // this.setState({timerIsWorking:false});
     };
 
     resting = () => {
@@ -131,7 +119,7 @@ class App extends Component {
             return {
                 time:prevState.settingContainer[3],
                 second:prevState.settingContainer[4],
-                timerIsWorking: false,
+                timerWorkingState: 'Resting',
                 round: prevState.round - 1,
                 completed: prevState.completed + 1
             }});
@@ -141,19 +129,11 @@ class App extends Component {
         console.log('working...');
         this.setState((prevState)=>{
             return {
-                timerIsWorking: true,
+                timerWorkingState: 'Working',
                 time: prevState.settingContainer[1],
                 second: prevState.settingContainer[2]
 
             }})
-    };
-
-    timerFinish = () => {
-        console.log('Timer finished');
-        this.setState({
-            timerBtnStatus: 'Stop',
-            timerIsWorking: false
-        })
     };
 
     render() {
@@ -171,7 +151,6 @@ class App extends Component {
                     pauseTimer={this.handlePauseTimer}
                     stopTimer={this.handleStopTimer}
                     status={this.state.timerBtnStatus}
-                    // workingState={this.state.timerIsWorking}
                 />
             </div>
         )

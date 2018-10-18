@@ -27,11 +27,11 @@ class Setting extends Component {
     updateTimer(e) {
         e.preventDefault();
 
-        const round = e.target.round.value.trim();
-        const minute = e.target.minute.value.trim();
-        const second = e.target.second.value.trim();
-        const restMinute = e.target.restMinute.value.trim();
-        const restSecond = e.target.restSecond.value.trim();
+        const round = e.target.round.value;
+        const minute = e.target.minute.value;
+        const second = e.target.second.value;
+        const restMinute = e.target.restMinute.value;
+        const restSecond = e.target.restSecond.value;
 
         this.setState(()=>{
             return {
