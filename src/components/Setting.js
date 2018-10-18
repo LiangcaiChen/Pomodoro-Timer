@@ -28,9 +28,10 @@ class Setting extends Component {
         return (
             <div>
                 <h3>You can change your timer setting below.</h3>
+                {this.state.error}
                 <form onSubmit={this.updateTimer} >
                     <input type='number' name='minute' defaultValue={this.props.defaultMinute}/>
-                    <input type='text' name='second' defaultValue={this.props.defaultSecond}/>
+                    <input type='number' name='second' defaultValue={this.props.defaultSecond}/>
                     <button>Update timer</button>
                 </form>
             </div>

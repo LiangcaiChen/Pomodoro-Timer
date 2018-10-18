@@ -10,7 +10,7 @@ class App extends Component {
 
         this.state ={
             minute:25,
-            second:'00',
+            second:0,
             completed:0
         };
     }
@@ -22,7 +22,11 @@ class App extends Component {
         }
 
         if (!second) {
-            second = '00'
+            second = 0
+        }
+
+        if(second > 59 || second < 0 || minute < 0 || (second == 0 && minute == 0)) {
+            return 'Please enter valid time';
         }
 
         this.setState(() => {
@@ -40,7 +44,7 @@ class App extends Component {
 
     tick = () => {
 
-        if(this.state.second >= '00') {
+        if(this.state.second >= 0) {
             console.log(this.state.minute);
             this.setState((prevState)=>{
                 return (
@@ -49,16 +53,16 @@ class App extends Component {
             })
         }
 
-        if(this.state.second < '00' && this.state.minute > 0) {
+        if(this.state.second < 0 && this.state.minute > 0) {
             this.setState((prevState)=>{
                 return (
                     {minute: prevState.minute-1,
-                     second: '59'}
+                     second: 59}
                 )
             })
         }
 
-        if(this.state.minute <= 0 && this.state.second < '00') {
+        if(this.state.minute <= 0 && this.state.second < 0) {
             console.log('finished');
             clearInterval(this.intervalHandle);
             this.setState((prevState) => {
