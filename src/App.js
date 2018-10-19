@@ -12,8 +12,6 @@ class App extends Component {
             round:4,
             minute:25,
             second:0,
-            restMinute:5,
-            restSecond:0,
             settingContainer:[4,25,0,5,0],
             completed:0,
             timerBtnStatus: undefined,
@@ -38,22 +36,19 @@ class App extends Component {
             return 'Please enter valid time';
         }
 
-        console.log(this.state.settingContainer);
-
         this.setState(() => {
             return {
                 round:round,
                 minute: minute,
                 second:second,
-                restMinute:restMinute,
-                restSecond:restSecond,
                 settingContainer:[round, minute, second, restMinute, restSecond]
             }
         });
+        console.log(this.state.settingContainer);
     };
 
     handleStartTimer = () => {
-        console.log("Timer start...");
+        console.log('Timer start...');
         this.intervalHandle = setInterval(this.tick, 1000);
         this.setState({
             timerBtnStatus:'Start',
@@ -88,9 +83,7 @@ class App extends Component {
                         minute: prevState.minute-1,
                         second: 59
                 })});
-            console.log(typeof remainingMinute);
         }
-
 
         else if(remainingMinute === 0 && remainingSecond === 0) {
             if(this.state.round > 0) {
@@ -99,7 +92,6 @@ class App extends Component {
                 this.timerFinish();
             }
         }
-
     };
 
     resting = () => {
