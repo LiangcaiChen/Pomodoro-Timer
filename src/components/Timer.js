@@ -10,10 +10,20 @@ class Timer extends Component {
         }
     };
 
+    timerChecker = () => {
+        let isWorking = this.props.timerIsWorking;
+
+        if(isWorking === undefined || isWorking === true) {
+            return 'Working time left: '
+        } else {
+            return 'Resting time left: '
+        }
+    };
+
     render() {
         return (
             <div>
-                <h3>Current timer: </h3>
+                <h3>{this.timerChecker()} </h3>
                 {this.props.minute}:{this.props.second}
                 <button
                     disabled={this.props.status === 'Start'}

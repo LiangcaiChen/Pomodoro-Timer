@@ -24,21 +24,12 @@ class App extends Component {
     // set default timer rounds:4; working time: 25:00; resting time: 5:00
     handleUpdateTimer = (round, minute, second, restMinute, restSecond) => {
 
-        if(!round) {
-            round=4
-        }
-        if(!minute) {
-            minute=25
-        }
-        if(!second) {
-            second=0
-        }
-        if(!restMinute){
-            restMinute=5
-        }
-        if(!restSecond) {
-            restSecond = 0
-        }
+        // set up default values
+        if(!round) {round=4}
+        if(!minute) {minute=25}
+        if(!second) {second=0}
+        if(!restMinute){restMinute=5}
+        if(!restSecond) {restSecond = 0}
 
         // inserted number get from setting is a type of string
         round=parseInt(round); minute=parseInt(minute); second=parseInt(second); restMinute=parseInt(restMinute); restSecond=parseInt(restSecond);
@@ -47,9 +38,7 @@ class App extends Component {
             return 'Please enter valid time';
         }
 
-        console.log('Round: ' + round + ' Minute: ' + minute + ' Second ' + second);
-        console.log(typeof minute);
-        console.log(typeof second);
+        console.log(this.state.settingContainer);
 
         this.setState(() => {
             return {
@@ -64,6 +53,7 @@ class App extends Component {
     };
 
     handleStartTimer = () => {
+        console.log("Timer start...");
         this.intervalHandle = setInterval(this.tick, 1000);
         this.setState({
             timerBtnStatus:'Start',
@@ -74,16 +64,6 @@ class App extends Component {
     handlePauseTimer = () => {
         clearInterval(this.intervalHandle);
         this.setState({timerBtnStatus:'Pause'});
-    };
-
-    handleStopTimer = () => {
-        clearInterval(this.intervalHandle);
-        this.setState({
-            minute:25,
-            second:0,
-            timerBtnStatus:'Stop',
-            timerIsWorking: undefined
-        });
     };
 
     tick = () => {
@@ -98,7 +78,6 @@ class App extends Component {
                 return (
                     {second: prevState.second-1}
                 )})
-            // console.log(typeof remainingMinute)
         }
 
         // min - 1 when second runs out
@@ -112,21 +91,19 @@ class App extends Component {
             console.log(typeof remainingMinute);
         }
 
-        else if(remainingMinute === 0 && remainingSecond === 0 && this.state.round > 0) {
-            if(isWorking === true) {
-                this.resting();
-            } else if (isWorking === false) {
-                this.working();
+
+        else if(remainingMinute === 0 && remainingSecond === 0) {
+            if(this.state.round > 0) {
+                isWorking ? this.resting() : this.working();
+            } else if (this.state.round === 0) {
+                this.timerFinish();
             }
-        } else if (this.state.round === 0) {
-            this.timerFinish();
         }
 
-        // this.setState({timerIsWorking:false});
     };
 
     resting = () => {
-        console.log('resting...');
+        console.log('Resting...');
         this.setState((prevState) => {
             return {
                 time:prevState.settingContainer[3],
@@ -150,10 +127,17 @@ class App extends Component {
 
     timerFinish = () => {
         console.log('Timer finished');
-        this.setState({
-            timerBtnStatus: 'Stop',
-            timerIsWorking: false
-        })
+        this.setState((prevState)=>{
+            return ({
+                round: prevState.settingContainer[0],
+                minute: prevState.settingContainer[1],
+                second: prevState.settingContainer[2],
+                restMinute: prevState.settingContainer[3],
+                restSecond: prevState.settingContainer[4],
+                timerBtnStatus: 'Stop',
+                timerIsWorking: undefined
+            })});
+        clearInterval(this.intervalHandle);
     };
 
     render() {
@@ -169,9 +153,9 @@ class App extends Component {
                     second={this.state.second}
                     startTimer={this.handleStartTimer}
                     pauseTimer={this.handlePauseTimer}
-                    stopTimer={this.handleStopTimer}
+                    stopTimer={this.timerFinish}
                     status={this.state.timerBtnStatus}
-                    // workingState={this.state.timerIsWorking}
+                    timerIsWorking={this.state.timerIsWorking}
                 />
             </div>
         )
