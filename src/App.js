@@ -3,12 +3,14 @@ import Header from './components/Header';
 import Setting from './components/Setting';
 import Timer from './components/Timer';
 import TimerBin from './components/TimerBin';
+import openSocket from 'socket.io-client';
 
 class App extends Component {
     constructor(props) {
         super(props);
 
         this.state ={
+            socket: null,
             round:4,
             minute:25,
             second:0,
@@ -18,6 +20,28 @@ class App extends Component {
             timerIsWorking: undefined
         };
     }
+
+    componentWillMount() {
+        this.initSocket();
+    };
+
+    componentDidMount() {
+        this.state.socket.on("timer", (minute,second)=> {
+            console.log('Time remaining: ' + minute+' : ' + second);
+        });
+    };
+
+    initSocket = () => {
+        const socket = openSocket('http://localhost:8000');
+
+        socket.on('connect', ()=> {
+            console.log('connected');
+        });
+
+        this.setState({socket});
+    };
+
+
 
     // set default timer rounds:4; working time: 25:00; resting time: 5:00
     handleUpdateTimer = (round, minute, second, restMinute, restSecond) => {
@@ -65,6 +89,8 @@ class App extends Component {
         let remainingSecond = this.state.second;
         let remainingMinute = this.state.minute;
         let isWorking = this.state.timerIsWorking;
+
+        this.state.socket.emit("timer", remainingMinute,remainingSecond);
 
         // second count down bu 1
         if(remainingSecond > 0) {
