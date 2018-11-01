@@ -1,6 +1,6 @@
-import React, {Compnent} from 'react';
+import React, {Component} from 'react';
 
-class TimerPage extends Compnent {
+class TimerPage extends Component {
     render() {
         return (
             <div>

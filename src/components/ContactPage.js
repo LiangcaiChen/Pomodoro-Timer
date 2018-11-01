@@ -1,6 +1,6 @@
-import React, {Compnent} from 'react';
+import React, {Component} from 'react';
 
-class ContactPage extends Compnent {
+class ContactPage extends Component {
     render() {
         return (
             <div>
